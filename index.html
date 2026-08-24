@@ -50,7 +50,6 @@
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
         input[type="color"]::-webkit-color-swatch { border: 1px solid rgba(128,128,128,0.5); border-radius: 4px; }
 
-        /* ================= KỸ THUẬT AUTO-HIDE TOOLBAR ================= */
         .racing-toolbar {
             position: absolute; top: 0; left: 0; right: 0; z-index: 100;
             transform: translateY(-100%); opacity: 0;
@@ -59,7 +58,6 @@
         .racing-toolbar.show-toolbar { transform: translateY(0); opacity: 1; }
         .hover-trigger-area { position: absolute; top: 0; left: 0; right: 0; height: 50px; z-index: 99; }
 
-        /* ================= HIỆU ỨNG VĐV & ĐƯỜNG ĐUA ================= */
         .racer-wrapper { position: absolute; display: flex; align-items: center; z-index: 30; transition: left 0.1s linear; }
         .racer-icon { display: inline-block; transform: scaleX(-1); animation: bounceAnim 0.3s infinite alternate; filter: drop-shadow(0px 0px 8px rgba(255,255,255,0.4)); line-height: 1; }
         @keyframes bounceAnim { 0% { transform: scaleX(-1) translateY(2px) rotate(3deg); } 100% { transform: scaleX(-1) translateY(-2px) rotate(-3deg); } }
@@ -70,7 +68,6 @@
         .trail-3 { transform: translateY(8px); width: 25px; animation-delay: 0.2s; animation-duration: 0.5s; }
         @keyframes windAnim { 0% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(-40px); opacity: 0; } }
 
-        /* VIVID TRACK STYLES (Đường đua sống động) */
         .track-horse-container { background: rgba(30, 20, 10, 0.85); box-shadow: inset 0 0 50px rgba(0,0,0,0.8); }
         .track-horse-lane { border-bottom: 1px solid rgba(139, 69, 19, 0.4); }
         .track-horse-lane::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: rgba(34, 139, 34, 0.3); }
@@ -94,9 +91,9 @@
         <div class="glass-panel rounded-3xl p-6 md:p-8 w-full max-w-7xl grid grid-cols-1 lg:grid-cols-4 gap-8 relative">
             
             <div class="lg:col-span-1 flex flex-col gap-4 border-r border-gray-400/20 pr-0 lg:pr-6">
-                <!-- Tiêu đề sự kiện động -->
+                <!-- Tiêu đề sự kiện động: Double-click vào đây để mở khoá VIP Panel -->
                 <div class="text-center mb-2">
-                    <h1 id="mainTitleDisplay" class="text-2xl lg:text-3xl font-black theme-text-gradient uppercase tracking-widest break-words">GALA RACING 2026</h1>
+                    <h1 id="mainTitleDisplay" ondblclick="toggleVipPanel()" class="text-2xl lg:text-3xl font-black theme-text-gradient uppercase tracking-widest break-words cursor-default select-none transition-all hover:opacity-90">GALA RACING 2026</h1>
                 </div>
 
                 <div class="bg-black/20 rounded-2xl p-5 border border-gray-400/20 flex-1 flex flex-col">
@@ -125,15 +122,12 @@
                         </button>
                     </div>
                     
-                    <!-- Dòng cấu hình Tên sự kiện & Chọn Theme -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-1">
-                        <!-- Tên sự kiện -->
                         <div class="flex items-center gap-2 bg-black/20 p-2 rounded-lg border border-gray-400/20">
                             <label class="text-xs font-bold whitespace-nowrap text-muted">Tên sự kiện:</label>
                             <input type="text" id="eventNameInput" value="GALA RACING 2026" oninput="updateEventName(this.value)" class="flex-1 bg-transparent border-none outline-none text-white text-sm font-bold" placeholder="Nhập tên sự kiện...">
                         </div>
                         
-                        <!-- Chọn Theme -->
                         <div class="flex flex-wrap gap-2 items-center justify-start md:justify-end">
                             <button onclick="changeTheme('gala')" class="text-xs font-semibold px-3 py-1.5 bg-[#2c351f] border border-[#f55b14] text-white rounded-lg hover:brightness-125 transition">Đêm Gala</button>
                             <button onclick="changeTheme('cyber')" class="text-xs font-semibold px-3 py-1.5 bg-[#0d1117] border border-[#00f2fe] text-white rounded-lg hover:brightness-125 transition">Cyberpunk</button>
@@ -141,7 +135,6 @@
                         </div>
                     </div>
 
-                    <!-- Dòng cấu hình Màu sắc & Nền -->
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-1">
                         <div class="flex items-center gap-2 bg-black/20 p-2 rounded-lg border border-gray-400/20 col-span-2 md:col-span-1">
                             <label class="text-xs font-bold flex-1 text-muted">Màu chữ:</label>
@@ -166,7 +159,7 @@
                 </div>
 
                 <div id="setup-controls" class="flex flex-col gap-5">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div id="settingsGrid" class="grid grid-cols-1 lg:grid-cols-1 gap-4">
                         
                         <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3">
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-1">
@@ -210,11 +203,12 @@
                             </div>
                         </div>
 
-                        <div class="glass-panel p-5 rounded-2xl relative overflow-hidden flex flex-col justify-center">
+                        <!-- PANEL VIP ẨN TÀNG HÌNH -->
+                        <div id="vipPanel" class="glass-panel p-5 rounded-2xl relative overflow-hidden flex-col justify-center hidden border border-orange-500/50 shadow-glow">
                             <label class="block text-sm theme-text mb-2 font-bold flex items-center gap-2 z-10">
                                 <span>🎯</span> Điều chỉnh kết quả (VIP Hạng 1)
                             </label>
-                            <select id="targetWinner" class="custom-input w-full rounded-xl p-3 appearance-none cursor-pointer z-10 relative font-bold text-sm">
+                            <select id="targetWinner" class="custom-input w-full rounded-xl p-3 appearance-none cursor-pointer z-10 relative font-bold text-sm text-yellow-400">
                                 <option value="random">🎲 Ngẫu nhiên (Công bằng 100%)</option>
                             </select>
                         </div>
@@ -236,10 +230,9 @@
         </div>
     </div>
 
-    <!-- VÙNG ĐUA FULL MÀN HÌNH -->
+    <!-- VÙNG ĐUA FULL MÀN HÌNH ĐÃ XOÁ VIỀN TRẮNG -->
     <div id="racingMode" class="hidden flex-col h-full bg-black/80 backdrop-blur-md relative overflow-hidden">
         
-        <!-- Hover Trigger Area: Rê chuột lên đỉnh màn hình để hiện menu -->
         <div class="hover-trigger-area" onmouseenter="showToolbar()"></div>
         
         <div id="racingToolbar" class="racing-toolbar p-4" onmouseleave="hideToolbar()">
@@ -256,8 +249,8 @@
             </div>
         </div>
 
-        <!-- Đường Đua Tràn Viền -->
-        <div class="flex-1 overflow-y-auto relative p-2 md:p-4 w-full h-full border-t border-b theme-border" id="trackContainer">
+        <!-- Khung chứa đường đua (Đã loại bỏ các class border-t, border-b, theme-border) -->
+        <div class="flex-1 overflow-y-auto relative w-full h-full" id="trackContainer">
             <div id="lanesContainer" class="flex flex-col relative z-10 w-full min-h-full pb-2"></div>
         </div>
     </div>
@@ -282,11 +275,24 @@
     </div>
 
     <script>
-        // CẬP NHẬT TÊN SỰ KIỆN ĐỘNG TRÊN TRÌNH DUYỆT & GIAO DIỆN
+        // --- HỆ THỐNG VIP ẨN ---
+        function toggleVipPanel() {
+            const panel = document.getElementById('vipPanel');
+            const grid = document.getElementById('settingsGrid');
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden'); panel.classList.add('flex');
+                grid.classList.remove('lg:grid-cols-1'); grid.classList.add('lg:grid-cols-2');
+            } else {
+                panel.classList.remove('flex'); panel.classList.add('hidden');
+                grid.classList.remove('lg:grid-cols-2'); grid.classList.add('lg:grid-cols-1');
+            }
+        }
+
+        // --- HỆ THỐNG GIAO DIỆN & TÊN SỰ KIỆN ---
         function updateEventName(val) {
             const newName = val.trim() || "GALA RACING";
-            document.title = newName; // Cập nhật tab trình duyệt
-            document.getElementById('mainTitleDisplay').innerText = newName; // Cập nhật tiêu đề góc trái
+            document.title = newName; 
+            document.getElementById('mainTitleDisplay').innerText = newName; 
         }
 
         function changeTheme(themeType) {
@@ -431,7 +437,8 @@
 
         function renderLanes() {
             const selectedRacer = document.getElementById('racerType').value; const config = racerConfigs[selectedRacer];
-            trackContainer.className = `flex-1 overflow-y-auto relative w-full h-full border-t border-b theme-border shadow-glow-lg ${config.containerClass}`;
+            // Đã loại bỏ class viền thừa khỏi trackContainer
+            trackContainer.className = `flex-1 overflow-y-auto relative w-full h-full shadow-glow-lg ${config.containerClass}`;
             
             const availableHeight = window.innerHeight - 100; 
             const displayCount = Math.min(horses.length, 50); 
