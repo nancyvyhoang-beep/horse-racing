@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GALA RACING 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-layer: radial-gradient(ellipse at top, #3b4528, #1a2114, #0a0d08);
+            --primary-color: #f55b14;
+            --secondary-color: #ffb703;
+            --panel-bg: rgba(25, 30, 20, 0.6);
+            --text-main: #ffffff;
+            --input-bg: rgba(0,0,0,0.4);
+        }
+
+        body { 
+            margin: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-image: var(--bg-layer) !important; background-size: cover !important;
+            background-position: center !important; background-repeat: no-repeat !important;
+            background-attachment: fixed !important; background-color: #000 !important;
+            color: var(--text-main) !important; transition: color 0.4s ease;
+        }
+
+        .glass-panel { 
+            background: var(--panel-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: background 0.4s ease;
+        }
+
+        .text-muted { color: var(--text-main); opacity: 0.7; }
+        .theme-text-gradient { background: linear-gradient(to right, var(--primary-color), var(--secondary-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .theme-btn { background: linear-gradient(to right, var(--primary-color), var(--secondary-color)); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5); border: none; }
+        .theme-btn:hover { filter: brightness(1.15); }
+        .theme-text { color: var(--secondary-color); }
+        
+        .shadow-glow { box-shadow: 0 0 20px var(--primary-color); }
+        .finish-line { background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color), var(--primary-color)); box-shadow: 0 0 25px var(--primary-color); }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 10px; }
+        
+        .custom-input { background: var(--input-bg); border: 1px solid rgba(128,128,128,0.3); transition: all 0.3s ease; color: var(--text-main); }
+        .custom-input:focus { border-color: var(--primary-color); box-shadow: 0 0 10px var(--primary-color); outline: none; }
+        .custom-input option { background: #111; color: #fff; }
+
+        input[type="color"] { -webkit-appearance: none; border: none; padding: 0; }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: 1px solid rgba(128,128,128,0.5); border-radius: 4px; }
+
+        /* ================= KỸ THUẬT AUTO-HIDE TOOLBAR ================= */
+        .racing-toolbar {
+            position: absolute; top: 0; left: 0; right: 0; z-index: 100;
+            transform: translateY(-100%); opacity: 0;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+        }
+        .racing-toolbar.show-toolbar { transform: translateY(0); opacity: 1; }
+        .hover-trigger-area { position: absolute; top: 0; left: 0; right: 0; height: 50px; z-index: 99; }
+
+        /* ================= HIỆU ỨNG VĐV & ĐƯỜNG ĐUA ================= */
+        .racer-wrapper { position: absolute; display: flex; align-items: center; z-index: 30; transition: left 0.1s linear; }
+        .racer-icon { display: inline-block; transform: scaleX(-1); animation: bounceAnim 0.3s infinite alternate; filter: drop-shadow(0px 0px 8px rgba(255,255,255,0.4)); line-height: 1; }
+        @keyframes bounceAnim { 0% { transform: scaleX(-1) translateY(2px) rotate(3deg); } 100% { transform: scaleX(-1) translateY(-2px) rotate(-3deg); } }
+        
+        .speed-trail { position: absolute; right: 85%; height: 2px; background: linear-gradient(to right, transparent, var(--primary-color), var(--secondary-color)); border-radius: 5px; animation: windAnim 0.4s infinite linear; opacity: 0; pointer-events: none; }
+        .trail-1 { transform: translateY(-8px); width: 35px; animation-delay: 0.1s; } 
+        .trail-2 { transform: translateY(0px); width: 50px; animation-duration: 0.3s; } 
+        .trail-3 { transform: translateY(8px); width: 25px; animation-delay: 0.2s; animation-duration: 0.5s; }
+        @keyframes windAnim { 0% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(-40px); opacity: 0; } }
+
+        /* VIVID TRACK STYLES (Đường đua sống động) */
+        .track-horse-container { background: rgba(30, 20, 10, 0.85); box-shadow: inset 0 0 50px rgba(0,0,0,0.8); }
+        .track-horse-lane { border-bottom: 1px solid rgba(139, 69, 19, 0.4); }
+        .track-horse-lane::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: rgba(34, 139, 34, 0.3); }
+
+        .track-car-container { background: #1a1c20; box-shadow: inset 0 0 50px rgba(0,0,0,0.9); }
+        .track-car-lane { border-bottom: 2px dashed rgba(255, 255, 255, 0.2); background: rgba(0,0,0,0.3); }
+
+        .track-duck-container { background: linear-gradient(180deg, rgba(0, 105, 148, 0.9) 0%, rgba(0, 168, 232, 0.8) 100%); }
+        .track-duck-lane { border-bottom: 1px solid rgba(255, 255, 255, 0.15); background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); }
+
+        .track-bird-container { background: linear-gradient(180deg, rgba(135, 206, 235, 0.85) 0%, rgba(200, 230, 255, 0.8) 100%); }
+        .track-bird-lane { border-bottom: 1px dashed rgba(255, 255, 255, 0.4); }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+
+    <audio id="bgMusic" loop src="https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=suspense-113264.mp3"></audio>
+    <audio id="winAudio" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=success-1-6297.mp3"></audio>
+
+    <div id="setupMode" class="w-full h-full overflow-y-auto p-4 md:p-8 flex items-center justify-center">
+        <div class="glass-panel rounded-3xl p-6 md:p-8 w-full max-w-7xl grid grid-cols-1 lg:grid-cols-4 gap-8 relative">
+            
+            <div class="lg:col-span-1 flex flex-col gap-4 border-r border-gray-400/20 pr-0 lg:pr-6">
+                <!-- Tiêu đề sự kiện động -->
+                <div class="text-center mb-2">
+                    <h1 id="mainTitleDisplay" class="text-2xl lg:text-3xl font-black theme-text-gradient uppercase tracking-widest break-words">GALA RACING 2026</h1>
+                </div>
+
+                <div class="bg-black/20 rounded-2xl p-5 border border-gray-400/20 flex-1 flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold theme-text">📋 Lịch Sử Đua</h3>
+                        <span id="roundCounterBadge" class="text-xs bg-black/40 px-2 py-1 rounded-md text-white border border-gray-400/30">Vòng 1</span>
+                    </div>
+                    
+                    <div id="historyList" class="flex-1 overflow-y-auto flex flex-col gap-2 mb-4 max-h-[30vh] lg:max-h-[40vh]">
+                        <p class="text-muted text-sm text-center italic mt-4" id="emptyHistoryMsg">Chưa có kết quả nào</p>
+                    </div>
+
+                    <button onclick="exportExcel()" class="w-full py-3 bg-[#1e7e34] hover:bg-[#155d27] rounded-xl font-bold transition-colors flex items-center justify-center gap-2 shadow-lg border border-green-700 text-white">
+                        <span>📊</span> Xuất file Excel
+                    </button>
+                </div>
+            </div>
+
+            <div class="lg:col-span-3 flex flex-col gap-5">
+                
+                <div class="glass-panel p-4 rounded-2xl flex flex-col gap-3 border border-gray-400/20">
+                    <div class="flex justify-between items-center w-full flex-wrap gap-2">
+                        <label class="text-sm theme-text font-bold flex items-center gap-2"><span>🎨</span> Giao diện & Hiển thị:</label>
+                        <button onclick="toggleFullScreen()" class="text-xs font-bold px-4 py-2 bg-black/40 hover:bg-black/60 border border-gray-400/30 text-white rounded-lg transition-colors flex items-center gap-2 shadow-lg">
+                            Mở Toàn Màn Hình <span>📺</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Dòng cấu hình Tên sự kiện & Chọn Theme -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-1">
+                        <!-- Tên sự kiện -->
+                        <div class="flex items-center gap-2 bg-black/20 p-2 rounded-lg border border-gray-400/20">
+                            <label class="text-xs font-bold whitespace-nowrap text-muted">Tên sự kiện:</label>
+                            <input type="text" id="eventNameInput" value="GALA RACING 2026" oninput="updateEventName(this.value)" class="flex-1 bg-transparent border-none outline-none text-white text-sm font-bold" placeholder="Nhập tên sự kiện...">
+                        </div>
+                        
+                        <!-- Chọn Theme -->
+                        <div class="flex flex-wrap gap-2 items-center justify-start md:justify-end">
+                            <button onclick="changeTheme('gala')" class="text-xs font-semibold px-3 py-1.5 bg-[#2c351f] border border-[#f55b14] text-white rounded-lg hover:brightness-125 transition">Đêm Gala</button>
+                            <button onclick="changeTheme('cyber')" class="text-xs font-semibold px-3 py-1.5 bg-[#0d1117] border border-[#00f2fe] text-white rounded-lg hover:brightness-125 transition">Cyberpunk</button>
+                            <button onclick="changeTheme('royal')" class="text-xs font-semibold px-3 py-1.5 bg-[#2b0f0f] border border-[#ffd700] text-white rounded-lg hover:brightness-125 transition">Hoàng Gia</button>
+                        </div>
+                    </div>
+
+                    <!-- Dòng cấu hình Màu sắc & Nền -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-1">
+                        <div class="flex items-center gap-2 bg-black/20 p-2 rounded-lg border border-gray-400/20 col-span-2 md:col-span-1">
+                            <label class="text-xs font-bold flex-1 text-muted">Màu chữ:</label>
+                            <input type="color" id="textColorPicker" value="#ffffff" onchange="updateTextColor(event)" class="w-7 h-7 rounded cursor-pointer bg-transparent">
+                        </div>
+                        <div class="flex items-center gap-2 bg-black/20 p-2 rounded-lg border border-gray-400/20 col-span-2 md:col-span-3">
+                            <label class="text-xs font-bold whitespace-nowrap text-muted">Ảnh nền (16:9):</label>
+                            <input type="file" id="bgUpload" accept="image/*" class="hidden" onchange="uploadBackground(event)">
+                            <button onclick="document.getElementById('bgUpload').click()" id="uploadBtnText" class="flex-1 text-xs font-bold px-3 py-1.5 bg-black/30 text-white rounded hover:bg-black/50 transition truncate border border-gray-400/30">
+                                📁 Nhấn để tải ảnh lên...
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="game-over-container" class="hidden flex-col items-center justify-center h-full text-center p-10 bg-black/20 rounded-2xl border border-gray-400/20">
+                    <div class="text-6xl mb-4">👑</div>
+                    <h2 class="text-3xl theme-text font-bold mb-6">Đã hoàn tất giải đấu!</h2>
+                    <button onclick="resetFullGame()" class="px-8 py-4 theme-btn rounded-full font-bold shadow-glow text-xl transition-all text-black">
+                        Tạo Giải Đấu Mới
+                    </button>
+                </div>
+
+                <div id="setup-controls" class="flex flex-col gap-5">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        
+                        <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3">
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-1">
+                                <div class="flex flex-col">
+                                    <label class="text-[11px] text-muted mb-1 ml-1 uppercase font-bold">Số lượng</label>
+                                    <input type="number" id="numHorses" value="5" min="2" max="150" class="custom-input w-full rounded-xl p-2.5 text-center font-bold">
+                                </div>
+                                <div class="flex flex-col">
+                                    <label class="text-[11px] text-muted mb-1 ml-1 uppercase font-bold">Thời gian(s)</label>
+                                    <input type="number" id="raceDuration" value="10" min="5" class="custom-input w-full rounded-xl p-2.5 text-center font-bold">
+                                </div>
+                                <div class="flex flex-col">
+                                    <label class="text-[11px] text-muted mb-1 ml-1 uppercase font-bold">Top</label>
+                                    <input type="number" id="topN" value="1" min="1" max="20" class="custom-input w-full rounded-xl p-2.5 text-center font-bold">
+                                </div>
+                                <div class="flex flex-col">
+                                    <label class="text-[11px] text-muted mb-1 ml-1 uppercase font-bold">Thể loại</label>
+                                    <select id="racerType" class="custom-input w-full rounded-xl p-2.5 text-center font-bold appearance-none cursor-pointer">
+                                        <option value="horse">🐎 Ngựa</option>
+                                        <option value="car">🏎️ Xe Hơi</option>
+                                        <option value="duck">🦆 Vịt</option>
+                                        <option value="bird">🦅 Chim</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-2">
+                                <button onclick="handleGenerateBtn()" class="flex-1 py-2 bg-black/30 hover:bg-black/50 border border-gray-400/30 text-white font-bold rounded-xl transition-all">Tạo Form Điền</button>
+                            </div>
+
+                            <div class="mt-2 pt-3 border-t border-gray-400/20">
+                                <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="importCSV(event)">
+                                <div class="flex gap-2">
+                                    <button onclick="document.getElementById('csvFileInput').click()" class="flex-[2] py-2.5 bg-[#1e7e34]/80 hover:bg-[#1e7e34] border border-[#1e7e34] rounded-xl text-white font-bold transition-all flex items-center justify-center gap-2">
+                                        <span>📁</span> Nhập CSV
+                                    </button>
+                                    <a href="data:text/csv;charset=utf-8,%EF%BB%BFTenNguoiChoi%0ANguyen%20Van%20A%0ATran%20Thi%20B%0ALe%20Van%20C%0APham%20Van%20D" download="Mau_DanhSach.csv" class="flex-1 flex items-center justify-center text-[11px] text-center border border-gray-400/30 rounded-xl hover:bg-black/20 transition text-muted font-semibold bg-black/10">
+                                        Tải mẫu
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-panel p-5 rounded-2xl relative overflow-hidden flex flex-col justify-center">
+                            <label class="block text-sm theme-text mb-2 font-bold flex items-center gap-2 z-10">
+                                <span>🎯</span> Điều chỉnh kết quả (VIP Hạng 1)
+                            </label>
+                            <select id="targetWinner" class="custom-input w-full rounded-xl p-3 appearance-none cursor-pointer z-10 relative font-bold text-sm">
+                                <option value="random">🎲 Ngẫu nhiên (Công bằng 100%)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl p-5 flex-1">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold">Danh sách thi đấu (<span id="horseCountDisplay" class="theme-text">0</span>)</h3>
+                        </div>
+                        <div id="horseInputs" class="max-h-[30vh] overflow-y-auto pr-2 grid grid-cols-2 md:grid-cols-4 gap-3">
+                        </div>
+                    </div>
+
+                    <button onclick="startRace()" class="w-full py-5 theme-btn rounded-2xl font-black text-2xl uppercase shadow-glow transition-all flex items-center justify-center gap-3 tracking-wider text-black">
+                        Bắt Đầu Đua <span>🏁</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VÙNG ĐUA FULL MÀN HÌNH -->
+    <div id="racingMode" class="hidden flex-col h-full bg-black/80 backdrop-blur-md relative overflow-hidden">
+        
+        <!-- Hover Trigger Area: Rê chuột lên đỉnh màn hình để hiện menu -->
+        <div class="hover-trigger-area" onmouseenter="showToolbar()"></div>
+        
+        <div id="racingToolbar" class="racing-toolbar p-4" onmouseleave="hideToolbar()">
+            <div class="flex justify-between items-center px-4 max-w-4xl mx-auto">
+                <div class="w-[150px]"></div>
+                
+                <div class="text-xs text-center text-white/50 bg-black/30 backdrop-blur-md px-4 py-1.5 rounded-full font-semibold tracking-widest border border-white/10">
+                    Di chuột xuống để ẩn menu
+                </div>
+                
+                <button onclick="goToSetup()" class="w-[150px] justify-end py-2 px-4 bg-red-500/80 hover:bg-red-600 border border-red-500/50 text-white rounded-xl transition-colors font-bold flex items-center gap-2 shadow-lg backdrop-blur-md">
+                    <span>🛑</span> Dừng & Huỷ
+                </button>
+            </div>
+        </div>
+
+        <!-- Đường Đua Tràn Viền -->
+        <div class="flex-1 overflow-y-auto relative p-2 md:p-4 w-full h-full border-t border-b theme-border" id="trackContainer">
+            <div id="lanesContainer" class="flex flex-col relative z-10 w-full min-h-full pb-2"></div>
+        </div>
+    </div>
+
+    <!-- MODAL CHIẾN THẮNG -->
+    <div id="winnerModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-xl items-center justify-center z-50 p-4 z-[1000]">
+        <div class="glass-panel p-8 md:p-12 rounded-[3rem] theme-border border-2 shadow-glow-lg text-center max-w-2xl w-full flex flex-col max-h-[90vh]">
+            <div class="text-6xl mb-4 animate-bounce filter drop-shadow-[0_0_20px_rgba(255,215,0,0.5)]">🏆</div>
+            <h2 class="text-2xl md:text-3xl font-bold text-muted mb-6">Kết Quả Vòng <span id="winRoundText">1</span></h2>
+            
+            <div id="winnersList" class="flex-1 overflow-y-auto flex flex-col gap-3 mb-8 px-2"></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-auto">
+                <button onclick="nextRound()" id="nextRoundBtn" class="py-4 theme-btn rounded-2xl font-bold text-lg shadow-glow transition-all hover:scale-105 text-black">
+                    Tiếp Tục (Loại Top Thắng)
+                </button>
+                <button onclick="rematch()" class="py-4 bg-black/40 hover:bg-black/60 border border-gray-400/30 rounded-2xl font-bold transition-colors text-white">
+                    Đua Lại Từ Đầu
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CẬP NHẬT TÊN SỰ KIỆN ĐỘNG TRÊN TRÌNH DUYỆT & GIAO DIỆN
+        function updateEventName(val) {
+            const newName = val.trim() || "GALA RACING";
+            document.title = newName; // Cập nhật tab trình duyệt
+            document.getElementById('mainTitleDisplay').innerText = newName; // Cập nhật tiêu đề góc trái
+        }
+
+        function changeTheme(themeType) {
+            const root = document.documentElement;
+            root.style.setProperty('--text-main', '#ffffff'); document.getElementById('textColorPicker').value = '#ffffff';
+            root.style.setProperty('--input-bg', 'rgba(0,0,0,0.4)');
+            
+            if (themeType === 'gala') {
+                root.style.setProperty('--bg-layer', 'radial-gradient(ellipse at top, #3b4528, #1a2114, #0a0d08)');
+                root.style.setProperty('--primary-color', '#f55b14'); root.style.setProperty('--secondary-color', '#ffb703');
+                root.style.setProperty('--panel-bg', 'rgba(25, 30, 20, 0.6)');
+            } else if (themeType === 'cyber') {
+                root.style.setProperty('--bg-layer', 'radial-gradient(ellipse at bottom, #0f172a, #020617, #000000)');
+                root.style.setProperty('--primary-color', '#00f2fe'); root.style.setProperty('--secondary-color', '#ff0844');
+                root.style.setProperty('--panel-bg', 'rgba(15, 23, 42, 0.7)');
+            } else if (themeType === 'royal') {
+                root.style.setProperty('--bg-layer', 'radial-gradient(circle at center, #4a0000, #1a0000, #000000)');
+                root.style.setProperty('--primary-color', '#ffd700'); root.style.setProperty('--secondary-color', '#ff8c00');
+                root.style.setProperty('--panel-bg', 'rgba(40, 10, 10, 0.7)');
+            }
+        }
+
+        function uploadBackground(event) {
+            const file = event.target.files[0]; if (!file) return;
+            document.getElementById('uploadBtnText').innerText = "⏳ Đang phân tích...";
+            const imageUrl = URL.createObjectURL(file);
+            const root = document.documentElement;
+            root.style.setProperty('--bg-layer', `url('${imageUrl}')`);
+
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+                canvas.width = img.width; canvas.height = img.height; ctx.drawImage(img, 0, 0);
+                try {
+                    const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                    let r = 0, g = 0, b = 0, count = 0;
+                    for (let i = 0; i < data.length; i += 400) { r += data[i]; g += data[i+1]; b += data[i+2]; count++; }
+                    r = Math.floor(r / count); g = Math.floor(g / count); b = Math.floor(b / count);
+                    const luminance = (0.299 * r + 0.587 * g + 0.114 * b);
+                    let rp = r/255, gp = g/255, bp = b/255; let max = Math.max(rp, gp, bp), min = Math.min(rp, gp, bp);
+                    let h = 0, s = 0, l = (max + min) / 2;
+                    if (max !== min) {
+                        let d = max - min; s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                        switch (max) { case rp: h = (gp - bp) / d + (gp < bp ? 6 : 0); break; case gp: h = (bp - rp) / d + 2; break; case bp: h = (rp - gp) / d + 4; break; }
+                        h *= 60;
+                    }
+
+                    if (luminance > 140) {
+                        root.style.setProperty('--text-main', '#111111'); document.getElementById('textColorPicker').value = '#111111';
+                        root.style.setProperty('--panel-bg', 'rgba(255, 255, 255, 0.6)'); root.style.setProperty('--input-bg', 'rgba(255, 255, 255, 0.4)');
+                        root.style.setProperty('--primary-color', `hsl(${h}, 90%, 40%)`); root.style.setProperty('--secondary-color', `hsl(${(h + 40) % 360}, 90%, 40%)`);
+                    } else {
+                        root.style.setProperty('--text-main', '#ffffff'); document.getElementById('textColorPicker').value = '#ffffff';
+                        root.style.setProperty('--panel-bg', 'rgba(15, 20, 25, 0.7)'); root.style.setProperty('--input-bg', 'rgba(0, 0, 0, 0.5)');
+                        root.style.setProperty('--primary-color', `hsl(${h}, 90%, 65%)`); root.style.setProperty('--secondary-color', `hsl(${(h + 40) % 360}, 90%, 65%)`);
+                    }
+                } catch (e) {}
+                document.getElementById('uploadBtnText').innerText = "📁 Tải ảnh khác...";
+            };
+            img.src = imageUrl; event.target.value = '';
+        }
+
+        function updateTextColor(event) { document.documentElement.style.setProperty('--text-main', event.target.value); }
+
+        const racerConfigs = {
+            horse: { emoji: '🐎', containerClass: 'track-horse-container', laneClass: 'track-horse-lane' },
+            car: { emoji: '🏎️', containerClass: 'track-car-container', laneClass: 'track-car-lane' },
+            duck: { emoji: '🦆', containerClass: 'track-duck-container', laneClass: 'track-duck-lane' },
+            bird: { emoji: '🦅', containerClass: 'track-bird-container', laneClass: 'track-bird-lane' }
+        };
+
+        let horses = []; let raceHistory = []; let raceInterval = null; let currentWinners = []; 
+        let idCounter = 0; let roundNumber = 1; 
+
+        const setupMode = document.getElementById('setupMode'); const racingMode = document.getElementById('racingMode');
+        const horseInputs = document.getElementById('horseInputs'); const lanesContainer = document.getElementById('lanesContainer');
+        const trackContainer = document.getElementById('trackContainer'); const winnerModal = document.getElementById('winnerModal');
+        const racingToolbar = document.getElementById('racingToolbar'); const bgMusic = document.getElementById('bgMusic'); 
+        const winAudio = document.getElementById('winAudio'); const targetWinnerSelect = document.getElementById('targetWinner'); 
+        const historyList = document.getElementById('historyList');
+
+        function showToolbar() { racingToolbar.classList.add('show-toolbar'); }
+        function hideToolbar() { racingToolbar.classList.remove('show-toolbar'); }
+
+        function importCSV(event) {
+            const file = event.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const lines = text.split(/\r\n|\n/).map(line => line.trim()).filter(line => line.length > 0);
+                let parsedNames = lines.map(line => line.split(',')[0].replace(/^"|"$/g, '').trim()).filter(name => name.length > 0);
+                const firstLower = parsedNames[0].toLowerCase();
+                if (firstLower === 'tên' || firstLower === 'name' || firstLower.includes('ngựa') || firstLower.includes('choi')) parsedNames.shift();
+                if (parsedNames.length === 0) { alert("File trống!"); return; }
+                if (parsedNames.length > 150) { alert(`Chỉ lấy 150 người đầu tiên.`); parsedNames = parsedNames.slice(0, 150); }
+                document.getElementById('numHorses').value = parsedNames.length;
+                horses = []; idCounter = 0;
+                parsedNames.forEach(name => { idCounter++; horses.push({ id: idCounter, name: name, progress: 0 }); });
+                renderInputs(); event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        function handleGenerateBtn() {
+            const num = Math.min(Math.max(parseInt(document.getElementById('numHorses').value), 2), 150);
+            document.getElementById('numHorses').value = num;
+            horses = []; idCounter = 0;
+            for(let i = 0; i < num; i++) { idCounter++; horses.push({ id: idCounter, name: `VĐV ${idCounter}`, progress: 0 }); }
+            renderInputs();
+        }
+
+        function renderInputs() {
+            document.getElementById('horseCountDisplay').innerText = horses.length;
+            const currentTarget = targetWinnerSelect.value;
+            targetWinnerSelect.innerHTML = '<option value="random">🎲 Ngẫu nhiên (Công bằng 100%)</option>';
+            if (horses.length <= 1) {
+                document.getElementById('game-over-container').classList.replace('hidden', 'flex');
+                document.getElementById('setup-controls').classList.add('hidden'); return;
+            }
+            document.getElementById('game-over-container').classList.replace('flex', 'hidden'); document.getElementById('setup-controls').classList.remove('hidden');
+
+            horseInputs.innerHTML = '';
+            horses.forEach((h, index) => {
+                const input = document.createElement('input'); input.type = 'text'; input.value = h.name;
+                input.className = 'custom-input rounded-xl p-3 text-sm text-center w-full shadow-inner font-semibold';
+                input.oninput = (e) => { horses[index].name = e.target.value; updateTargetSelectNames(); };
+                horseInputs.appendChild(input);
+
+                const option = document.createElement('option'); option.value = h.id; option.text = `Chỉ định: ${h.name}`;
+                targetWinnerSelect.appendChild(option);
+            });
+            if (horses.find(h => h.id == currentTarget)) targetWinnerSelect.value = currentTarget;
+        }
+
+        function updateTargetSelectNames() {
+            Array.from(targetWinnerSelect.options).forEach(opt => {
+                if(opt.value !== 'random') { const h = horses.find(h => h.id == opt.value); if(h) opt.text = `Chỉ định: ${h.name}`; }
+            });
+        }
+
+        function resetFullGame() { document.getElementById('numHorses').value = 5; roundNumber = 1; document.getElementById('roundCounterBadge').innerText = `Vòng ${roundNumber}`; handleGenerateBtn(); }
+
+        function renderLanes() {
+            const selectedRacer = document.getElementById('racerType').value; const config = racerConfigs[selectedRacer];
+            trackContainer.className = `flex-1 overflow-y-auto relative w-full h-full border-t border-b theme-border shadow-glow-lg ${config.containerClass}`;
+            
+            const availableHeight = window.innerHeight - 100; 
+            const displayCount = Math.min(horses.length, 50); 
+            let calculatedH = Math.floor(availableHeight / displayCount);
+            let laneHeight = Math.max(18, Math.min(65, calculatedH)); 
+            
+            let emojiSize = Math.max(0.9, (laneHeight * 0.6) / 16); 
+            let fontSize = Math.max(0.65, (laneHeight * 0.35) / 16); 
+
+            lanesContainer.innerHTML = '<div class="finish-line absolute top-0 bottom-0 right-[3%] w-2 md:w-3 z-0 opacity-90 shadow-glow-lg"></div>';
+            
+            horses.forEach(h => {
+                h.progress = 0; const lane = document.createElement('div');
+                lane.className = `relative w-full flex items-center overflow-hidden z-10 ${config.laneClass}`; 
+                lane.style.height = `${laneHeight}px`;
+                lane.innerHTML = `
+                    <div class="absolute left-4 font-bold opacity-90 w-[80px] md:w-[120px] truncate z-20 text-white drop-shadow-md" style="font-size: ${fontSize}rem;">${h.name}</div>
+                    <div id="horse-ui-${h.id}" class="racer-wrapper" style="left: calc(100px + 0%);">
+                        <div class="speed-trail trail-1"></div><div class="speed-trail trail-2"></div><div class="speed-trail trail-3"></div>
+                        <div class="racer-icon" style="font-size: ${emojiSize}rem;">${config.emoji}</div>
+                    </div>
+                `;
+                lanesContainer.appendChild(lane);
+            });
+        }
+
+        function formatExactTime(dateObj) {
+            const h = dateObj.getHours().toString().padStart(2, '0'); const m = dateObj.getMinutes().toString().padStart(2, '0');
+            const s = dateObj.getSeconds().toString().padStart(2, '0'); const ms = dateObj.getMilliseconds().toString().padStart(3, '0');
+            return `${h}:${m}:${s}.${ms}`;
+        }
+
+        function startRace() {
+            setupMode.classList.add('hidden'); racingMode.classList.replace('hidden', 'flex');
+            
+            renderLanes(); currentWinners = [];
+            bgMusic.currentTime = 0; bgMusic.play().catch(e => console.log("Cần tương tác để phát nhạc"));
+
+            const durationSec = parseFloat(document.getElementById('raceDuration').value) || 10;
+            let targetTopN = parseInt(document.getElementById('topN').value) || 1;
+            targetTopN = Math.max(1, Math.min(targetTopN, 20, horses.length));
+            document.getElementById('topN').value = targetTopN;
+            
+            const targetId = targetWinnerSelect.value;
+            const fps = 20; const maxStep = 100 / (durationSec * fps * 0.85);
+
+            raceInterval = setInterval(() => {
+                let newlyFinished = []; 
+                horses.forEach(h => {
+                    if (h.progress >= 100) return;
+                    let step = Math.random() * maxStep;
+                    if (targetId !== "random") {
+                        if (h.id == targetId) step = step * 1.3; 
+                        else { const vip = horses.find(x => x.id == targetId); if (vip && vip.progress < 100 && h.progress + step >= 99) step = 99 - h.progress; }
+                    }
+                    h.progress += step;
+                    const el = document.getElementById(`horse-ui-${h.id}`);
+                    if (el) el.style.left = `calc(100px + ${(Math.min(h.progress, 100) * 0.85)}%)`; 
+                    if (h.progress >= 100 && !currentWinners.find(w => w.id === h.id)) newlyFinished.push({...h});
+                });
+
+                if(newlyFinished.length > 0) {
+                    newlyFinished.sort((a, b) => b.progress - a.progress);
+                    let baseNow = Date.now();
+                    newlyFinished.forEach((nf, idx) => { nf.exactTimeDate = new Date(baseNow + (idx * 25)); currentWinners.push(nf); });
+                }
+
+                if (currentWinners.length >= targetTopN || currentWinners.length === horses.length) {
+                    currentWinners = currentWinners.slice(0, targetTopN);
+                    clearInterval(raceInterval); bgMusic.pause(); winAudio.currentTime = 0; winAudio.play();
+                    saveHistory(currentWinners); showWinners(currentWinners); 
+                }
+            }, 50);
+        }
+
+        function saveHistory(winnersList) {
+            const emptyMsg = document.getElementById('emptyHistoryMsg'); if (emptyMsg) emptyMsg.remove();
+            const winnerNamesText = winnersList.map((w, index) => `${index + 1}. ${w.name}`).join(' | ');
+            const item = document.createElement('div'); item.className = "flex flex-col bg-black/20 p-3 rounded-xl border border-gray-400/20 text-sm mb-2";
+            item.innerHTML = `
+                <div class="flex justify-between items-center mb-1">
+                    <span class="font-bold text-muted">Vòng ${roundNumber}</span>
+                    <span class="text-[10px] text-muted">Xem chi tiết ở CSV</span>
+                </div>
+                <div class="font-bold theme-text text-xs leading-relaxed">${winnerNamesText}</div>
+            `;
+            historyList.prepend(item); 
+            winnersList.forEach((w, index) => {
+                const timeWithMs = formatExactTime(w.exactTimeDate);
+                raceHistory.push({ round: roundNumber, rank: index + 1, name: w.name, time: timeWithMs });
+            });
+        }
+
+        function exportExcel() {
+            const eventName = document.getElementById('eventNameInput').value.trim() || "KetQua_Dua";
+            const safeFileName = eventName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+
+            if (raceHistory.length === 0) { alert("Chưa có dữ liệu!"); return; }
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFFVong Dua,Hang,Ten Nguoi Thang,Thoi Gian (Chinh xac Ms)\n";
+            raceHistory.forEach(row => { csvContent += `${row.round},${row.rank},"${row.name}","${row.time}"\n`; });
+            const link = document.createElement("a"); link.setAttribute("href", encodeURI(csvContent)); 
+            link.setAttribute("download", `${safeFileName}.csv`);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        function showWinners(winnersList) {
+            document.getElementById('winRoundText').innerText = roundNumber;
+            const container = document.getElementById('winnersList'); container.innerHTML = ''; 
+            winnersList.forEach((w, index) => {
+                const rank = index + 1;
+                let rankDisplay = rank === 1 ? '🥇 Hạng 1' : rank === 2 ? '🥈 Hạng 2' : rank === 3 ? '🥉 Hạng 3' : `🏅 Hạng ${rank}`;
+                let colorClass = rank === 1 ? 'theme-text text-2xl md:text-4xl' : rank === 2 ? 'text-gray-200 opacity-90 text-xl md:text-2xl' : rank === 3 ? 'text-orange-400 opacity-90 text-xl md:text-2xl' : 'opacity-80 text-lg';
+                container.innerHTML += `
+                    <div class="flex items-center justify-between bg-black/40 p-3 rounded-xl border border-gray-400/20">
+                        <span class="font-bold text-muted text-sm md:text-base w-24 text-left">${rankDisplay}</span>
+                        <div class="flex-1 text-left flex flex-col justify-center truncate px-2">
+                            <span class="font-black ${colorClass} truncate leading-none drop-shadow-md">${w.name}</span>
+                            ${rank === 1 ? `<span class="text-[10px] text-muted mt-1 uppercase font-bold">Cán đích lúc: ${formatExactTime(w.exactTimeDate)}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            winnerModal.classList.replace('hidden', 'flex');
+        }
+
+        function goToSetup() { clearInterval(raceInterval); bgMusic.pause(); winnerModal.classList.replace('flex', 'hidden'); racingMode.classList.replace('flex', 'hidden'); setupMode.classList.remove('hidden'); renderInputs(); }
+        
+        function rematch() { 
+            const toRemove = raceHistory.filter(r => r.round === roundNumber).length;
+            raceHistory.splice(-toRemove, toRemove); historyList.removeChild(historyList.firstChild);
+            if(raceHistory.length === 0) historyList.innerHTML = '<p class="text-muted text-sm text-center italic mt-4" id="emptyHistoryMsg">Chưa có kết quả nào</p>';
+            goToSetup(); 
+        }
+        
+        function nextRound() {
+            const winnerIds = currentWinners.map(w => w.id);
+            horses = horses.filter(h => !winnerIds.includes(h.id));
+            document.getElementById('numHorses').value = horses.length;
+            roundNumber++; document.getElementById('roundCounterBadge').innerText = `Vòng ${roundNumber}`; goToSetup();
+        }
+
+        function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e => console.log(e)); else document.exitFullscreen(); }
+        
+        // Khởi tạo ban đầu
+        updateEventName(document.getElementById('eventNameInput').value);
+        handleGenerateBtn();
+    </script>
+</body>
+</html>
